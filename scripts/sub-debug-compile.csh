@@ -49,8 +49,10 @@ else
     set ORA_LIB = "-L$ORACLE_HOME_POSIX -L$ORACLE_HOME_POSIX/bin -loci"
 endif
 
-set OPT = "-D_FORTIFY_SOURCE=2 -O2"
-# set OPT="-O2"
+set OPT = "-O2 -std=c99 -D_XOPEN_SOURCE=700"
+
+set FORTIFY = "-D_FORTIFY_SOURCE=2"
+# set FORTIFY = ""
 set STACK = "-fstack-protector-all"
 # set STACK=""
 # set MF = "-fmudflap -lmudflap"
@@ -66,18 +68,20 @@ else
     set GLIBC = ""
 endif
 
-set DEBUG="${OPT} ${STACK} ${MF} ${ARRAY} ${GLIBC}"
+set DEBUG="-g ${FORTIFY} ${STACK} ${MF} ${ARRAY} ${GLIBC}"
 
 set WARN  = " -Wall -Wextra"
 set IGN   = " -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable"
 set IGN   = "${IGN} -Wno-parentheses -Wno-implicit-function-declaration -Wno-implicit-int" 
-set IGN   = "${IGN} -Wno-incompatible-pointer-types"
+# set IGN   = "${IGN} -Wno-incompatible-pointer-types"
 set DEFER = " -Wno-pointer-sign -Wno-format-extra-args"
 
 # Pro*C generates incomplete field initializers
 set PROC  = " -Wno-missing-field-initializers"
 # -Wno-return-type
 
-gcc -g ${DEBUG} ${WARN} ${IGN} ${DEFER} ${PROC} ${ORA_INC} "$c" -o "$n" ${ORA_LIB} ${MF} ${GLIBC} |& tee gcc.log
+gcc ${OPT} ${DEBUG} ${WARN} ${IGN} ${DEFER} ${PROC} ${ORA_INC} "$c" -o "$n" ${ORA_LIB} ${MF} ${GLIBC} |& tee gcc.log
+
+echo
 
 exit $status
