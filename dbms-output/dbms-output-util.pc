@@ -45,6 +45,9 @@ void dbms_output_check(const char *msg);
 /* Generic internal fetch routine used by the public functions */
 int dbms_output_fetch(char *line, short *line_ind, int *status);
 
+/* Fetch up to max_lines using DBMS_OUTPUT.GET_LINES */
+size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines);
+
 /* Print all DBMS_OUTPUT lines to stdout */
 void dbms_output_print_stdout(void);
 
@@ -129,60 +132,73 @@ int dbms_output_fetch(char *line, short *line_ind, int *status)
     return *status;
 }
 
+size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines)
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+    int num = (int)max_lines;
+    EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
+    EXEC SQL EXECUTE
+        BEGIN
+            dbms_output.get_lines(:lines, :num);
+        END;
+    END-EXEC;
+
+    return (size_t)num;
+}
+
 void dbms_output_print_stdout(void)
 {
-    char line[32767];
-    short line_ind = 0;
-    int status = 0;
+    char lines[20][32767];
+    size_t count;
 
-    while ((status = dbms_output_fetch(line, &line_ind, &status)) == 0)
-    {
-        if (line_ind >= 0)
-            printf("%s\n", line);
-    }
+    do {
+        count = dbms_output_fetch_lines(lines, 20);
+        for (size_t i = 0; i < count; ++i)
+            printf("%s\n", lines[i]);
+    } while (count > 0);
 }
 
 void dbms_output_print_file(FILE *fp)
 {
-    char line[32767];
-    short line_ind = 0;
-    int status = 0;
-
     if (!fp)
         return;
 
-    while ((status = dbms_output_fetch(line, &line_ind, &status)) == 0)
-    {
-        if (line_ind >= 0)
-            fprintf(fp, "%s\n", line);
-    }
+    char lines[20][32767];
+    size_t count;
+
+    do {
+        count = dbms_output_fetch_lines(lines, 20);
+        for (size_t i = 0; i < count; ++i)
+            fprintf(fp, "%s\n", lines[i]);
+    } while (count > 0);
 }
 
 void dbms_output_collect_list(struct dbms_output_node **head)
 {
-    char line[32767];
-    short line_ind = 0;
-    int status = 0;
-    struct dbms_output_node **current = head;
-
     if (!head)
         return;
 
     *head = NULL;
+    struct dbms_output_node **current = head;
 
-    while ((status = dbms_output_fetch(line, &line_ind, &status)) == 0)
-    {
-        if (line_ind < 0)
-            continue;
-        struct dbms_output_node *node =
-            (struct dbms_output_node *)malloc(sizeof(struct dbms_output_node));
-        if (!node)
-            break;
-        node->line = strdup(line);
-        node->next = NULL;
-        *current = node;
-        current = &node->next;
-    }
+    char lines[20][32767];
+    size_t count;
+
+    do {
+        count = dbms_output_fetch_lines(lines, 20);
+        for (size_t i = 0; i < count; ++i) {
+            struct dbms_output_node *node =
+                (struct dbms_output_node *)malloc(sizeof(struct dbms_output_node));
+            if (!node)
+                return;
+            node->line = strdup(lines[i]);
+            node->next = NULL;
+            *current = node;
+            current = &node->next;
+        }
+    } while (count > 0);
 }
 
 void dbms_output_free_list(struct dbms_output_node *head)
@@ -198,52 +214,48 @@ void dbms_output_free_list(struct dbms_output_node *head)
 
 void dbms_output_collect_buffer(char *buffer, size_t buffer_size)
 {
-    char line[32767];
-    short line_ind = 0;
-    int status = 0;
-    size_t pos = 0;
-
     if (!buffer || buffer_size == 0)
         return;
 
     buffer[0] = '\0';
+    size_t pos = 0;
+    char lines[20][32767];
+    size_t count;
 
-    while ((status = dbms_output_fetch(line, &line_ind, &status)) == 0)
-    {
-        if (line_ind < 0)
-            continue;
-        size_t len = strlen(line);
-        if (pos + len + 2 >= buffer_size)
-            break;
-        memcpy(buffer + pos, line, len);
-        pos += len;
-        buffer[pos++] = '\n';
-        buffer[pos] = '\0';
-    }
+    do {
+        count = dbms_output_fetch_lines(lines, 20);
+        for (size_t i = 0; i < count; ++i) {
+            size_t len = strlen(lines[i]);
+            if (pos + len + 2 >= buffer_size) {
+                buffer[pos] = '\0';
+                return;
+            }
+            memcpy(buffer + pos, lines[i], len);
+            pos += len;
+            buffer[pos++] = '\n';
+            buffer[pos] = '\0';
+        }
+    } while (count > 0);
 }
 
 size_t dbms_output_collect_array(char **lines, size_t max_lines)
 {
-    char line[32767];
-    short line_ind = 0;
-    int status = 0;
-    size_t count = 0;
-
     if (!lines || max_lines == 0)
         return 0;
 
-    while (count < max_lines &&
-           (status = dbms_output_fetch(line, &line_ind, &status)) == 0)
-    {
-        if (line_ind < 0)
-            continue;
-        lines[count++] = strdup(line);
-    }
+    size_t count = 0;
+    char chunk[20][32767];
+    size_t fetched;
 
-    /* Drain remaining lines if any */
-    while ((status == 0))
-        status = dbms_output_fetch(line, &line_ind, &status);
+    do {
+        fetched = dbms_output_fetch_lines(chunk, 20);
+        for (size_t i = 0; i < fetched && count < max_lines; ++i)
+            lines[count++] = strdup(chunk[i]);
+    } while (fetched > 0 && count < max_lines);
+
+    /* Drain any remaining lines */
+    while (fetched > 0)
+        fetched = dbms_output_fetch_lines(chunk, 20);
 
     return count;
 }
-
