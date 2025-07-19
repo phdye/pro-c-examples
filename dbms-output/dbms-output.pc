@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+EXEC SQL INCLUDE sqlca;
+
+void sql_check(const char *msg) {
+    if (sqlca.sqlcode != 0) {
+        fprintf(stderr, "%s failed: ORA-%d: %.*s\n", msg, sqlca.sqlcode, sqlca.sqlerrm.sqlerrml, sqlca.sqlerrm.sqlerrmc);
+        exit(1);
+    }
+}
+
+int main() {
+
+    EXEC SQL BEGIN DECLARE SECTION;
+    const char *connect = getenv("CONNECT");
+    EXEC SQL END DECLARE SECTION;
+
+    if (!connect) {
+        fprintf(stderr, "CONNECT environment variable not set.\n");
+        return 1;
+    }
+
+    EXEC SQL CONNECT :connect;
+    sql_check("CONNECT");
+
+    // Enable DBMS_OUTPUT
+    EXEC SQL EXECUTE BEGIN dbms_output.enable(NULL); END; END-EXEC;
+    sql_check("dbms_output.enable");
+
+    // Call dbms_output.put_line
+    EXEC SQL EXECUTE BEGIN dbms_output.put_line('Hello from Pro*C!'); END; END-EXEC;
+    sql_check("dbms_output.put_line");
+
+    // Prepare to fetch output
+    EXEC SQL BEGIN DECLARE SECTION;
+    char line[32767];
+    int status;
+    EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL WHENEVER SQLERROR DO sql_check("dbms_output.get_line");
+
+    printf("DBMS_OUTPUT:\n");
+
+    do {
+        EXEC SQL EXECUTE
+            BEGIN
+                dbms_output.get_line(:line, :status);
+            END;
+        END-EXEC;
+
+        if (status == 0)
+            printf("%s\n", line);
+
+    } while (status == 0);
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return 0;
+}

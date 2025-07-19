@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+
+import struct
+import sys
+import os
+
+def read_pe_exports(dll_path):
+    with open(dll_path, 'rb') as f:
+        data = f.read()
+
+    # IMAGE_DOS_HEADER (offset 0x3C is e_lfanew)
+    e_lfanew = struct.unpack_from('<I', data, 0x3C)[0]
+    if data[e_lfanew:e_lfanew+4] != b'PE\0\0':
+        raise ValueError('Not a PE file')
+
+    # IMAGE_FILE_HEADER and IMAGE_OPTIONAL_HEADER
+    machine, number_of_sections, _, _, _, size_of_optional_header, characteristics = struct.unpack_from('<HHIIIHH', data, e_lfanew + 4)
+    optional_header_offset = e_lfanew + 24
+    magic = struct.unpack_from('<H', data, optional_header_offset)[0]
+
+    if magic == 0x10b:
+        is_pe32plus = False
+        export_table_rva_offset = optional_header_offset + 96
+    elif magic == 0x20b:
+        is_pe32plus = True
+        export_table_rva_offset = optional_header_offset + 112
+    else:
+        raise ValueError('Unknown PE magic')
+
+    export_rva, export_size = struct.unpack_from('<II', data, export_table_rva_offset)
+
+    # Locate section headers
+    section_offset = optional_header_offset + size_of_optional_header
+    exports = []
+
+    def rva_to_file_offset(rva):
+        for i in range(number_of_sections):
+            off = section_offset + 40 * i
+            virtual_address, size_of_raw_data, pointer_to_raw_data = struct.unpack_from('<IIII', data, off + 12)[:3]
+            if virtual_address <= rva < virtual_address + size_of_raw_data:
+                return pointer_to_raw_data + (rva - virtual_address)
+        raise ValueError(f'Cannot find file offset for RVA {hex(rva)}')
+
+    export_dir_offset = rva_to_file_offset(export_rva)
+
+    num_functions, num_names, addr_funcs_rva, addr_names_rva, addr_ordinals_rva = struct.unpack_from('<IIIIII', data, export_dir_offset + 16)[:5]
+
+    funcs_offset = rva_to_file_offset(addr_funcs_rva)
+    names_offset = rva_to_file_offset(addr_names_rva)
+    ordinals_offset = rva_to_file_offset(addr_ordinals_rva)
+
+    func_rvas = struct.unpack_from(f'<{num_functions}I', data, funcs_offset)
+    name_rvas = struct.unpack_from(f'<{num_names}I', data, names_offset)
+    ordinals = struct.unpack_from(f'<{num_names}H', data, ordinals_offset)
+
+    for i in range(num_names):
+        name_rva = name_rvas[i]
+        name_offset = rva_to_file_offset(name_rva)
+        end = data.find(b'\x00', name_offset)
+        name = data[name_offset:end].decode(errors='replace')
+        ordinal = ordinals[i] + 1  # DLL ordinals are 1-based
+        exports.append((name, ordinal))
+
+    return exports
+
+def write_def_file(dll_name, exports, output):
+    output.write(f'LIBRARY {dll_name}\n')
+    output.write('EXPORTS\n')
+    for name, ordinal in sorted(exports, key=lambda x: x[1]):
+        output.write(f'  {name} @{ordinal}\n')
+
+def main():
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <dllfile>", file=sys.stderr)
+        sys.exit(1)
+
+    dll_path = sys.argv[1]
+    dll_name = os.path.basename(dll_path)
+    exports = read_pe_exports(dll_path)
+    write_def_file(dll_name, exports, sys.stdout)
+
+if __name__ == '__main__':
+    main()
