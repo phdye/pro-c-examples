@@ -6,8 +6,8 @@ PROGRAMS = dbms-output.exe dbms-output-usage.exe varchar-util-test.exe
 
 .SUFFIXES: .pc .exe
 
-.pc.exe:
-	./scripts/debug-compile.sh $<
+# .pc.exe:
+# 	./scripts/debug-compile.sh $<
 
 all: ${PROGRAMS}
 
@@ -22,6 +22,15 @@ all: ${PROGRAMS}
 
 # varchar-util-test: varchar_util.pc varchar-util-test.pc
 # 	./scripts/debug-compile.sh varchar-util-test.pc
+
+dbms-output.exe : dbms-output.pc
+	./scripts/debug-compile.sh $<
+
+dbms-output-usage.exe : dbms-output-usage.pc dbms_output_util.pc
+	./scripts/debug-compile.sh $<
+
+varchar-util-test.exe: varchar-util-test.pc varchar_util.pc
+	./scripts/debug-compile.sh $<
 
 clean:
 	rm -f *.exe *.o *.c *.lis *.log
