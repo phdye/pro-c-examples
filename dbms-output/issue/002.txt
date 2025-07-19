@@ -1,0 +1,144 @@
+Script started on 2025-07-19 04:36:59-04:00 [COMMAND="set -x && ./scripts/debug-compile.sh dbms-output-usage.pc" TERM="screen.xterm-256color" TTY="/dev/pty2" COLUMNS="131" LINES="42"]
++ ./scripts/debug-compile.sh dbms-output-usage.pc
+set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle"
+proc USERID="${CONNECT}" ${PROC_OPT} "$pc" | & tee proc.log
+Pro*C/C++: Release 23.0.0.0.0 - Production on Sat Jul 19 04:36:59 2025
+Version 23.6.0.24.10
+Copyright (c) 1982, 2024, Oracle and/or its affiliates.  All rights reserved.
+System default option values taken from: D:\app\oracle\db\23-6\dbhomeFree\precomp\admin\pcscfg.cfg
+if ( $status != 0 ) exit 1
+set ORA_INC = "-I${ORACLE_SDK_INCLUDE}"
+if ( $?CYGWIN == 0 ) then
+set ORA_LIB = "-L$ORACLE_HOME_POSIX -L$ORACLE_HOME_POSIX/bin -loci"
+endif
+set OPT = "-D_FORTIFY_SOURCE=2 -O2"
+set STACK = "-fstack-protector-all"
+set MF=""
+set ARRAY = " -Warray-bounds -O2"
+if ( $?CYGWIN == 0 ) then
+set GLIBC = ""
+endif
+set DEBUG="${OPT} ${STACK} ${MF} ${ARRAY} ${GLIBC}"
+set WARN = " -Wall -Wextra"
+set IGN1 = " -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable"
+set IGN2 = " -Wno-parentheses -Wno-implicit-function-declaration -Wno-implicit-int"
+set DEFER = " -Wno-pointer-sign -Wno-format-extra-args"
+set PROC = " -Wno-missing-field-initializers"
+gcc -g ${DEBUG} ${WARN} ${IGN1} ${IGN2} ${DEFER} ${PROC} ${ORA_INC} "$c" -o "$n" ${ORA_LIB} ${MF} ${GLIBC} | & tee gcc.log
+In file included from dbms-output-usage.c:159:
+dbms-output-util.pc:24:1: error: unknown type name ‘EXEC’
+   24 | EXEC SQL INCLUDE sqlca;
+      | ^~~~
+dbms-output-util.pc:24:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘INCLUDE’
+   24 | EXEC SQL INCLUDE sqlca;
+      |          ^~~~~~~
+dbms-output-util.pc:24:10: error: unknown type name ‘INCLUDE’
+dbms-output-util.pc: In function ‘dbms_output_enable’:
+dbms-output-util.pc:87:5: error: unknown type name ‘EXEC’
+   87 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.enable");
+      |     ^~~~
+dbms-output-util.pc:87:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘WHENEVER’
+   87 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.enable");
+      |              ^~~~~~~~
+dbms-output-util.pc:88:5: error: unknown type name ‘EXEC’
+   88 |     EXEC SQL BEGIN DECLARE SECTION;
+      |     ^~~~
+dbms-output-util.pc:88:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘BEGIN’
+   88 |     EXEC SQL BEGIN DECLARE SECTION;
+      |              ^~~~~
+dbms-output-util.pc:91:5: error: unknown type name ‘EXEC’
+   91 |     EXEC SQL END DECLARE SECTION;
+      |     ^~~~
+dbms-output-util.pc:91:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘END’
+   91 |     EXEC SQL END DECLARE SECTION;
+      |              ^~~
+dbms-output-util.pc:96:5: error: unknown type name ‘EXEC’
+   96 |     EXEC SQL EXECUTE
+      |     ^~~~
+dbms-output-util.pc:96:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘EXECUTE’
+   96 |     EXEC SQL EXECUTE
+      |              ^~~~~~~
+dbms-output-util.pc:99:9: error: ‘END’ undeclared (first use in this function)
+   99 |         END;
+      |         ^~~
+dbms-output-util.pc:99:9: note: each undeclared identifier is reported only once for each function it appears in
+dbms-output-util.pc:100:9: error: ‘EXEC’ undeclared (first use in this function)
+  100 |     END-EXEC;
+      |         ^~~~
+dbms-output-util.pc: In function ‘dbms_output_disable’:
+dbms-output-util.pc:105:5: error: unknown type name ‘EXEC’
+  105 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.disable");
+      |     ^~~~
+dbms-output-util.pc:105:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘WHENEVER’
+  105 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.disable");
+      |              ^~~~~~~~
+dbms-output-util.pc:106:5: error: unknown type name ‘EXEC’
+  106 |     EXEC SQL EXECUTE
+      |     ^~~~
+dbms-output-util.pc:106:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘EXECUTE’
+  106 |     EXEC SQL EXECUTE
+      |              ^~~~~~~
+dbms-output-util.pc:109:9: error: ‘END’ undeclared (first use in this function)
+  109 |         END;
+      |         ^~~
+dbms-output-util.pc:110:9: error: ‘EXEC’ undeclared (first use in this function)
+  110 |     END-EXEC;
+      |         ^~~~
+dbms-output-util.pc: In function ‘dbms_output_check’:
+dbms-output-util.pc:115:9: error: ‘sqlca’ undeclared (first use in this function); did you mean ‘sqlcxt’?
+  115 |     if (sqlca.sqlcode != 0) {
+      |         ^~~~~
+      |         sqlcxt
+dbms-output-util.pc: In function ‘dbms_output_fetch’:
+dbms-output-util.pc:126:5: error: unknown type name ‘EXEC’
+  126 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_line");
+      |     ^~~~
+dbms-output-util.pc:126:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘WHENEVER’
+  126 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_line");
+      |              ^~~~~~~~
+dbms-output-util.pc:127:5: error: unknown type name ‘EXEC’
+  127 |     EXEC SQL EXECUTE
+      |     ^~~~
+dbms-output-util.pc:127:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘EXECUTE’
+  127 |     EXEC SQL EXECUTE
+      |              ^~~~~~~
+dbms-output-util.pc:130:9: error: ‘END’ undeclared (first use in this function)
+  130 |         END;
+      |         ^~~
+dbms-output-util.pc:131:9: error: ‘EXEC’ undeclared (first use in this function)
+  131 |     END-EXEC;
+      |         ^~~~
+dbms-output-util.pc: In function ‘dbms_output_fetch_lines’:
+dbms-output-util.pc:137:5: error: unknown type name ‘EXEC’
+  137 |     EXEC SQL BEGIN DECLARE SECTION;
+      |     ^~~~
+dbms-output-util.pc:137:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘BEGIN’
+  137 |     EXEC SQL BEGIN DECLARE SECTION;
+      |              ^~~~~
+dbms-output-util.pc:139:5: error: unknown type name ‘EXEC’
+  139 |     EXEC SQL END DECLARE SECTION;
+      |     ^~~~
+dbms-output-util.pc:139:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘END’
+  139 |     EXEC SQL END DECLARE SECTION;
+      |              ^~~
+dbms-output-util.pc:141:5: error: unknown type name ‘EXEC’
+  141 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
+      |     ^~~~
+dbms-output-util.pc:141:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘WHENEVER’
+  141 |     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
+      |              ^~~~~~~~
+dbms-output-util.pc:142:5: error: unknown type name ‘EXEC’
+  142 |     EXEC SQL EXECUTE
+      |     ^~~~
+dbms-output-util.pc:142:14: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘EXECUTE’
+  142 |     EXEC SQL EXECUTE
+      |              ^~~~~~~
+dbms-output-util.pc:145:9: error: ‘END’ undeclared (first use in this function)
+  145 |         END;
+      |         ^~~
+dbms-output-util.pc:146:9: error: ‘EXEC’ undeclared (first use in this function)
+  146 |     END-EXEC;
+      |         ^~~~
+exit $status
+Script done on 2025-07-19 04:37:00-04:00 [COMMAND_EXIT_CODE="1"]
+
