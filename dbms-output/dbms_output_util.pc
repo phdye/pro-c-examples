@@ -141,6 +141,7 @@ EXEC SQL BEGIN DECLARE SECTION;
 #define MAX_LINE_LENGTH 32767
 #define MAX_LINES 1000  /* or some maximum upper bound */
     static VARCHAR ora_lines[MAX_LINES][MAX_LINE_LENGTH + 1];
+    static short   ora_lines_ind[MAX_LINES];
 EXEC SQL END DECLARE SECTION;
 
 size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) {
@@ -154,10 +155,12 @@ size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) 
 
         if (ora_num_lines > MAX_LINES)
             ora_num_lines = MAX_LINES;
+
+        memset(ora_lines_ind, 0, sizeof(ora_lines_ind));
         EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
         EXEC SQL EXECUTE
             BEGIN
-                DBMS_OUTPUT.GET_LINES(:ora_lines, :ora_num_lines);
+                DBMS_OUTPUT.GET_LINES(:ora_lines:ora_lines_ind, :ora_num_lines);
             END;
         END-EXEC;
 
@@ -170,8 +173,11 @@ size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) 
             break;  // No lines fetched, exit loop
         }
 
-        for (int i = 0; i < ora_num_lines && ora_lines[i].len > 0; ++i) {
-            strncpy(lines[fetched], (const char *)ora_lines[i].arr, ora_lines[i].len);
+        for (int i = 0; i < ora_num_lines; ++i) {
+            if (ora_lines_ind[i] < 0 || ora_lines[i].len <= 0)
+                continue;
+            strncpy(lines[fetched], (const char *)ora_lines[i].arr,
+                    ora_lines[i].len);
             lines[fetched][ora_lines[i].len] = '\0';  // null-terminate
             fetched++;
         }
