@@ -1,15 +1,16 @@
 /*
- * dbms-output-usage.pc - Demonstration program for dbms-output-util
+ * dbms-output-usage.pc - Demonstration program for dbms_output_util
  *
  * This example connects using the CONNECT environment variable and
- * showcases the various utility functions defined in dbms-output-util.pc.
+ * showcases the various utility functions defined in dbms_output_util.pc.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "dbms-output-util.pc"  /* Include prototypes */
+/* Include utility function implementations so they are precompiled */
+EXEC SQL INCLUDE dbms_output_util;
 
 EXEC SQL INCLUDE sqlca;
 
