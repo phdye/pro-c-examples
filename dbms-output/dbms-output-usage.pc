@@ -13,9 +13,9 @@
  * Include the DBMS_OUTPUT helper functions directly so the Pro*C
  * precompiler processes them along with this demo program.
  */
-#include "dbms_output_util.pc"
-
 EXEC SQL INCLUDE sqlca;
+
+EXEC SQL INCLUDE dbms_output_util.pc;
 
 /* Simple helper to connect using CONNECT env variable */
 static void connect_db(void)

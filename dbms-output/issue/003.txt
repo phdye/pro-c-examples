@@ -1,0 +1,25 @@
+Script started on 2025-07-19 05:13:46-04:00 [COMMAND="set -x && ./scripts/debug-compile.sh dbms-output-usage.pc" TERM="screen.xterm-256color" TTY="/dev/pty2" COLUMNS="131" LINES="42"]
++ ./scripts/debug-compile.sh dbms-output-usage.pc
+set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle include=."
+echo "+ proc USERID="${CONNECT}" ${PROC_OPT} '$pc' |& tee proc.log"
++ proc USERID=/@free1 SQLCHECK=SEMANTICS mode=oracle include=. 'dbms-output-usage.pc' |& tee proc.log
+proc USERID="${CONNECT}" ${PROC_OPT} "$pc" | & tee proc.log
+Pro*C/C++: Release 23.0.0.0.0 - Production on Sat Jul 19 05:13:46 2025
+Version 23.6.0.24.10
+Copyright (c) 1982, 2024, Oracle and/or its affiliates.  All rights reserved.
+System default option values taken from: D:\app\oracle\db\23-6\dbhomeFree\precomp\admin\pcscfg.cfg
+Error at line 150, column 13 in file dbms_output_util.pc
+            dbms_output.get_lines(:x_lines, :num);
+............1
+PLS-S-00306, wrong number or types of arguments in call to 'GET_LINES'
+Error at line 150, column 13 in file dbms_output_util.pc
+            dbms_output.get_lines(:x_lines, :num);
+............1
+PLS-S-00000, Statement ignored
+Semantic error at line 149, column 9, file dbms_output_util.pc:
+        BEGIN
+........1
+PCC-S-02346, PL/SQL found semantic errors
+if ( $status != 0 ) exit 1
+Script done on 2025-07-19 05:13:46-04:00 [COMMAND_EXIT_CODE="1"]
+

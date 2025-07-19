@@ -25,12 +25,13 @@ set verbose=1
 
 # MaxLiteral Too large :  16, 8, 4, 2 K -- only accepts 1024 -- the default
 # mode=oracle
-set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle"
+set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle include=."
 # set PROC_OPT = "SQLCHECK=none"
 # set PROC_OPT = "SQLCHECK=FULL"
 
 # echo ; echo $PATH | tr : '\n' ; echo
 
+echo "+ proc USERID="${CONNECT}" ${PROC_OPT} '$pc' |& tee proc.log"
 proc USERID="${CONNECT}" ${PROC_OPT} "$pc" |& tee proc.log
 if ( $status != 0 ) exit 1
 

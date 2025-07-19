@@ -82,8 +82,7 @@ size_t dbms_output_collect_array(char **lines, size_t max_lines);
 
 /* Implementation section --------------------------------------------------*/
 
-void dbms_output_enable(int bufsize)
-{
+void dbms_output_enable(int bufsize) {
     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.enable");
     EXEC SQL BEGIN DECLARE SECTION;
     int size = bufsize;
@@ -100,8 +99,7 @@ void dbms_output_enable(int bufsize)
     END-EXEC;
 }
 
-void dbms_output_disable(void)
-{
+void dbms_output_disable(void) {
     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.disable");
     EXEC SQL EXECUTE
         BEGIN
@@ -110,8 +108,7 @@ void dbms_output_disable(void)
     END-EXEC;
 }
 
-void dbms_output_check(const char *msg)
-{
+void dbms_output_check(const char *msg) {
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "%s failed: ORA-%d: %.*s\n", msg,
                 sqlca.sqlcode,
@@ -121,35 +118,43 @@ void dbms_output_check(const char *msg)
     }
 }
 
-int dbms_output_fetch(char *line, short *line_ind, int *status)
-{
+int dbms_output_fetch(char *line, short *line_ind, int *status) {
+    // Variables passed to the SQL block must be declared in the
+    // DECLARE SECTION to ensure they are properly handled by Pro*C.
+    EXEC SQL BEGIN DECLARE SECTION;
+    char *x_line = line;
+    short *x_line_ind = line_ind;
+    int *x_status = status;
+    EXEC SQL END DECLARE SECTION;
+
     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_line");
     EXEC SQL EXECUTE
         BEGIN
-            dbms_output.get_line(:line:line_ind, :status);
+            dbms_output.get_line(:x_line:x_line_ind, :x_status);
         END;
     END-EXEC;
     return *status;
 }
 
-size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines)
-{
+size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines) {
+    // Variables passed to the SQL block must be declared in the
+    // DECLARE SECTION to ensure they are properly handled by Pro*C.
     EXEC SQL BEGIN DECLARE SECTION;
-    int num = (int)max_lines;
+    char **x_lines = (char **) lines;
+    int num = (int) max_lines;
     EXEC SQL END DECLARE SECTION;
 
     EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
     EXEC SQL EXECUTE
         BEGIN
-            dbms_output.get_lines(:lines, :num);
+            dbms_output.get_lines(:x_lines, :num);
         END;
     END-EXEC;
 
-    return (size_t)num;
+    return (size_t) num;
 }
 
-void dbms_output_print_stdout(void)
-{
+void dbms_output_print_stdout(void) {
     char lines[20][32767];
     size_t count;
 
@@ -160,8 +165,7 @@ void dbms_output_print_stdout(void)
     } while (count > 0);
 }
 
-void dbms_output_print_file(FILE *fp)
-{
+void dbms_output_print_file(FILE *fp) {
     if (!fp)
         return;
 
@@ -175,8 +179,7 @@ void dbms_output_print_file(FILE *fp)
     } while (count > 0);
 }
 
-void dbms_output_collect_list(struct dbms_output_node **head)
-{
+void dbms_output_collect_list(struct dbms_output_node **head) {
     if (!head)
         return;
 
