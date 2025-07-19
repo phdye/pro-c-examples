@@ -19,7 +19,7 @@ set pc="$1"
 set n = ` echo "$pc" | sed 's/\.pc$//' `
 set c = "$n.c"
 
-set verbose=1
+# set verbose=1
 
 #----------------------------------------------------------------------
 
@@ -31,9 +31,12 @@ set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle include=."
 
 # echo ; echo $PATH | tr : '\n' ; echo
 
-echo "+ proc USERID="${CONNECT}" ${PROC_OPT} '$pc' |& tee proc.log"
-proc USERID="${CONNECT}" ${PROC_OPT} "$pc" |& tee proc.log
-if ( $status != 0 ) exit 1
+echo "+ proc USERID="${CONNECT}" ${PROC_OPT} '$pc' >& proc.log"
+proc USERID="${CONNECT}" ${PROC_OPT} "$pc" >& proc.log
+if ( $status != 0 ) then
+    cat proc.log
+    exit 1
+endif
 
 #----------------------------------------------------------------------
 
@@ -66,14 +69,15 @@ endif
 set DEBUG="${OPT} ${STACK} ${MF} ${ARRAY} ${GLIBC}"
 
 set WARN  = " -Wall -Wextra"
-set IGN1  = " -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable"
-set IGN2  = " -Wno-parentheses -Wno-implicit-function-declaration -Wno-implicit-int" 
+set IGN   = " -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable"
+set IGN   = "${IGN} -Wno-parentheses -Wno-implicit-function-declaration -Wno-implicit-int" 
+set IGN   = "${IGN} -Wno-incompatible-pointer-types"
 set DEFER = " -Wno-pointer-sign -Wno-format-extra-args"
 
 # Pro*C generates incomplete field initializers
 set PROC  = " -Wno-missing-field-initializers"
 # -Wno-return-type
 
-gcc -g ${DEBUG} ${WARN} ${IGN1} ${IGN2} ${DEFER} ${PROC} ${ORA_INC} "$c" -o "$n" ${ORA_LIB} ${MF} ${GLIBC} |& tee gcc.log
+gcc -g ${DEBUG} ${WARN} ${IGN} ${DEFER} ${PROC} ${ORA_INC} "$c" -o "$n" ${ORA_LIB} ${MF} ${GLIBC} |& tee gcc.log
 
 exit $status
