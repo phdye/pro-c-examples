@@ -19,9 +19,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // for memcpy, strncpy
+#include <string.h>  // for memcpy, strncpy, strdup
 
-EXEC SQL INCLUDE sqlca;
+#ifdef __CYGWIN__
+#include <sqlca.h>
+#else
+// EXEC SQL INCLUDE SQLCA;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +50,11 @@ void dbms_output_check(const char *msg);
 int dbms_output_fetch(char *line, short *line_ind, int *status);
 
 /* Fetch up to max_lines using DBMS_OUTPUT.GET_LINES */
-size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines);
+EXEC SQL BEGIN DECLARE SECTION;
+#define DBMS_FETCH_MAX_LINE_LENGTH 32767
+#define DBMS_FETCH_MAX_LINES 1000  /* or some maximum upper bound */
+EXEC SQL END DECLARE SECTION;
+size_t dbms_output_fetch_lines(char lines[][DBMS_FETCH_MAX_LINE_LENGTH], size_t max_lines);
 
 /* Print all DBMS_OUTPUT lines to stdout */
 void dbms_output_print_stdout(void);
@@ -138,13 +146,11 @@ int dbms_output_fetch(char *line, short *line_ind, int *status) {
 
 
 EXEC SQL BEGIN DECLARE SECTION;
-#define MAX_LINE_LENGTH 32767
-#define MAX_LINES 1000  /* or some maximum upper bound */
-    static VARCHAR ora_lines[MAX_LINES][MAX_LINE_LENGTH + 1];
-    static short   ora_lines_ind[MAX_LINES];
+    static VARCHAR ora_lines[DBMS_FETCH_MAX_LINES][DBMS_FETCH_MAX_LINE_LENGTH + 1];
+    static short   ora_lines_ind[DBMS_FETCH_MAX_LINES];
 EXEC SQL END DECLARE SECTION;
 
-size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) {
+size_t dbms_output_fetch_lines(char lines[][DBMS_FETCH_MAX_LINE_LENGTH], size_t max_lines) {
 
     size_t fetched = 0;
 
@@ -153,8 +159,8 @@ size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) 
         int ora_num_lines = (int) (max_lines - fetched);
         EXEC SQL END DECLARE SECTION;
 
-        if (ora_num_lines > MAX_LINES)
-            ora_num_lines = MAX_LINES;
+        if (ora_num_lines > DBMS_FETCH_MAX_LINES)
+            ora_num_lines = DBMS_FETCH_MAX_LINES;
 
         memset(ora_lines_ind, 0, sizeof(ora_lines_ind));
         EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
@@ -201,7 +207,7 @@ void dbms_output_print_file(FILE *fp) {
     if (!fp)
         return;
 
-    char lines[20][32767];
+    char lines[20][DBMS_FETCH_MAX_LINE_LENGTH];
     size_t count;
 
     do {
@@ -218,14 +224,14 @@ void dbms_output_collect_list(struct dbms_output_node **head) {
     *head = NULL;
     struct dbms_output_node **current = head;
 
-    char lines[20][32767];
+    char lines[20][DBMS_FETCH_MAX_LINE_LENGTH];
     size_t count;
 
     do {
         count = dbms_output_fetch_lines(lines, 20);
         for (size_t i = 0; i < count; ++i) {
             struct dbms_output_node *node =
-                (struct dbms_output_node *)malloc(sizeof(struct dbms_output_node));
+                (struct dbms_output_node *) malloc(sizeof(struct dbms_output_node));
             if (!node)
                 return;
             node->line = strdup(lines[i]);
