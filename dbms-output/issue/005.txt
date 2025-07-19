@@ -1,0 +1,214 @@
+./scripts/debug-compile.sh varchar-util-test.pc
++ proc USERID=pbinter/DgbWXE_cUX13ZBn#@pbstest2 SQLCHECK=SEMANTICS mode=oracle include=. 'varchar-util-test.pc' >& proc.log
+varchar-util-test.c: In function ‘main’:
+varchar-util-test.c:363:5: warning: passing argument 2 of ‘cstr_to_varchar’ from incompatible pointer type [enabled by default]
+     cstr_to_varchar(" Hello ", &v1, MAX);
+     ^
+varchar-util-test.c:156:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void cstr_to_varchar(const char *src, VARCHAR *v, size_t max_vlen) {
+      ^
+varchar-util-test.c:364:5: warning: passing argument 2 of ‘cstr_to_varchar’ from incompatible pointer type [enabled by default]
+     cstr_to_varchar("World", &v2, MAX);
+     ^
+varchar-util-test.c:156:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void cstr_to_varchar(const char *src, VARCHAR *v, size_t max_vlen) {
+      ^
+varchar-util-test.c:366:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("v1", &v1);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:367:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("v2", &v2);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:370:5: warning: passing argument 1 of ‘varchar_trim’ from incompatible pointer type [enabled by default]
+     varchar_trim(&v1, &result, MAX);
+     ^
+varchar-util-test.c:292:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_trim(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:370:5: warning: passing argument 2 of ‘varchar_trim’ from incompatible pointer type [enabled by default]
+     varchar_trim(&v1, &result, MAX);
+     ^
+varchar-util-test.c:292:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_trim(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:371:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("trim(v1)", &result);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:374:5: warning: passing argument 1 of ‘varchar_upper’ from incompatible pointer type [enabled by default]
+     varchar_upper(&v2, &result, MAX);
+     ^
+varchar-util-test.c:303:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_upper(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:374:5: warning: passing argument 2 of ‘varchar_upper’ from incompatible pointer type [enabled by default]
+     varchar_upper(&v2, &result, MAX);
+     ^
+varchar-util-test.c:303:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_upper(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:375:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("upper(v2)", &result);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:378:5: warning: passing argument 1 of ‘varchar_lower’ from incompatible pointer type [enabled by default]
+     varchar_lower(&result, &result, MAX);
+     ^
+varchar-util-test.c:311:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_lower(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:378:5: warning: passing argument 2 of ‘varchar_lower’ from incompatible pointer type [enabled by default]
+     varchar_lower(&result, &result, MAX);
+     ^
+varchar-util-test.c:311:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_lower(const VARCHAR *src, VARCHAR *dest, size_t max_dest_len) {
+      ^
+varchar-util-test.c:379:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("lower", &result);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:382:5: warning: passing argument 1 of ‘varchar_concat’ from incompatible pointer type [enabled by default]
+     varchar_concat(&v1, &v2, &result, MAX);
+     ^
+varchar-util-test.c:236:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_concat(const VARCHAR *v1, const VARCHAR *v2, VARCHAR *result, size_t max_result_len) {
+      ^
+varchar-util-test.c:382:5: warning: passing argument 2 of ‘varchar_concat’ from incompatible pointer type [enabled by default]
+     varchar_concat(&v1, &v2, &result, MAX);
+     ^
+varchar-util-test.c:236:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_concat(const VARCHAR *v1, const VARCHAR *v2, VARCHAR *result, size_t max_result_len) {
+      ^
+varchar-util-test.c:382:5: warning: passing argument 3 of ‘varchar_concat’ from incompatible pointer type [enabled by default]
+     varchar_concat(&v1, &v2, &result, MAX);
+     ^
+varchar-util-test.c:236:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_concat(const VARCHAR *v1, const VARCHAR *v2, VARCHAR *result, size_t max_result_len) {
+      ^
+varchar-util-test.c:383:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("concat(v1, v2)", &result);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:386:5: warning: passing argument 1 of ‘varchar_cmp’ from incompatible pointer type [enabled by default]
+     int cmp = varchar_cmp(&v1, &v2);
+     ^
+varchar-util-test.c:199:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_cmp(const VARCHAR *v1, const VARCHAR *v2) {
+     ^
+varchar-util-test.c:386:5: warning: passing argument 2 of ‘varchar_cmp’ from incompatible pointer type [enabled by default]
+     int cmp = varchar_cmp(&v1, &v2);
+     ^
+varchar-util-test.c:199:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_cmp(const VARCHAR *v1, const VARCHAR *v2) {
+     ^
+varchar-util-test.c:390:5: warning: passing argument 1 of ‘varchar_icmp’ from incompatible pointer type [enabled by default]
+     cmp = varchar_icmp(&v2, &result);
+     ^
+varchar-util-test.c:214:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_icmp(const VARCHAR *v1, const VARCHAR *v2) {
+     ^
+varchar-util-test.c:390:5: warning: passing argument 2 of ‘varchar_icmp’ from incompatible pointer type [enabled by default]
+     cmp = varchar_icmp(&v2, &result);
+     ^
+varchar-util-test.c:214:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_icmp(const VARCHAR *v1, const VARCHAR *v2) {
+     ^
+varchar-util-test.c:394:5: warning: passing argument 1 of ‘varchar_index_char’ from incompatible pointer type [enabled by default]
+     int idx = varchar_index_char(&v2, 'o');
+     ^
+varchar-util-test.c:255:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_index_char(const VARCHAR *v, char c) {
+     ^
+varchar-util-test.c:398:5: warning: passing argument 2 of ‘cstr_to_varchar’ from incompatible pointer type [enabled by default]
+     cstr_to_varchar("lo", &result, MAX);
+     ^
+varchar-util-test.c:156:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void cstr_to_varchar(const char *src, VARCHAR *v, size_t max_vlen) {
+      ^
+varchar-util-test.c:399:5: warning: passing argument 1 of ‘varchar_index_of’ from incompatible pointer type [enabled by default]
+     idx = varchar_index_of(&v1, &result);
+     ^
+varchar-util-test.c:262:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_index_of(const VARCHAR *hay, const VARCHAR *needle) {
+     ^
+varchar-util-test.c:399:5: warning: passing argument 2 of ‘varchar_index_of’ from incompatible pointer type [enabled by default]
+     idx = varchar_index_of(&v1, &result);
+     ^
+varchar-util-test.c:262:5: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ int varchar_index_of(const VARCHAR *hay, const VARCHAR *needle) {
+     ^
+varchar-util-test.c:403:5: warning: passing argument 1 of ‘varchar_strdup’ from incompatible pointer type [enabled by default]
+     VARCHAR *copy = varchar_strdup(&v2);
+     ^
+varchar-util-test.c:185:10: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ VARCHAR *varchar_strdup(const VARCHAR *src) {
+          ^
+varchar-util-test.c:410:5: warning: passing argument 1 of ‘varchar_span’ from incompatible pointer type [enabled by default]
+     size_t span = varchar_span(&v2, "Wor");
+     ^
+varchar-util-test.c:278:8: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ size_t varchar_span(const VARCHAR *v, const char *set) {
+        ^
+varchar-util-test.c:414:5: warning: passing argument 1 of ‘varchar_cspan’ from incompatible pointer type [enabled by default]
+     span = varchar_cspan(&v2, "ld");
+     ^
+varchar-util-test.c:285:8: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ size_t varchar_cspan(const VARCHAR *v, const char *reject) {
+        ^
+varchar-util-test.c:418:5: warning: passing argument 1 of ‘varchar_set’ from incompatible pointer type [enabled by default]
+     varchar_set(&result, '*', 10, MAX);
+     ^
+varchar-util-test.c:326:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_set(VARCHAR *v, char ch, size_t len, size_t max_len) {
+      ^
+varchar-util-test.c:419:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("set '*'", &result);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:422:5: warning: passing argument 1 of ‘varchar_move’ from incompatible pointer type [enabled by default]
+     varchar_move(&v1, &v2, MAX);
+     ^
+varchar-util-test.c:319:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_move(VARCHAR *dest, const VARCHAR *src, size_t max_dest_len) {
+      ^
+varchar-util-test.c:422:5: warning: passing argument 2 of ‘varchar_move’ from incompatible pointer type [enabled by default]
+     varchar_move(&v1, &v2, MAX);
+     ^
+varchar-util-test.c:319:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_move(VARCHAR *dest, const VARCHAR *src, size_t max_dest_len) {
+      ^
+varchar-util-test.c:423:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("move(v2→v1)", &v1);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+varchar-util-test.c:426:5: warning: passing argument 1 of ‘varchar_bzero’ from incompatible pointer type [enabled by default]
+     varchar_bzero(&v2, MAX);
+     ^
+varchar-util-test.c:333:6: note: expected ‘struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void varchar_bzero(VARCHAR *v, size_t max_len) {
+      ^
+varchar-util-test.c:427:5: warning: passing argument 2 of ‘print_v’ from incompatible pointer type [enabled by default]
+     print_v("bzero(v2)", &v2);
+     ^
+varchar-util-test.c:354:6: note: expected ‘const struct VARCHAR *’ but argument is of type ‘struct <anonymous> *’
+ void print_v(const char *label, const VARCHAR *v) {
+      ^
+
