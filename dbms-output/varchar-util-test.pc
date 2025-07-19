@@ -22,71 +22,71 @@ void print_v(const char *label, const VARCHAR *v) {
 int main() {
     printf("=== VARCHAR UTIL TEST ===\n");
 
-    cstr_to_varchar(" Hello ", &v1, MAX);
-    cstr_to_varchar("World", &v2, MAX);
+    cstr_to_varchar(" Hello ", (VARCHAR*)&v1, MAX);
+    cstr_to_varchar("World", (VARCHAR*)&v2, MAX);
 
-    print_v("v1", &v1);
-    print_v("v2", &v2);
+    print_v("v1", (VARCHAR*)&v1);
+    print_v("v2", (VARCHAR*)&v2);
 
     // Test trim
-    varchar_trim(&v1, &result, MAX);
-    print_v("trim(v1)", &result);
+    varchar_trim((VARCHAR*)&v1, (VARCHAR*)&result, MAX);
+    print_v("trim(v1)", (VARCHAR*)&result);
 
     // Test upper
-    varchar_upper(&v2, &result, MAX);
-    print_v("upper(v2)", &result);
+    varchar_upper((VARCHAR*)&v2, (VARCHAR*)&result, MAX);
+    print_v("upper(v2)", (VARCHAR*)&result);
 
     // Test lower
-    varchar_lower(&result, &result, MAX);
-    print_v("lower", &result);
+    varchar_lower((VARCHAR*)&result, (VARCHAR*)&result, MAX);
+    print_v("lower", (VARCHAR*)&result);
 
     // Test concat
-    varchar_concat(&v1, &v2, &result, MAX);
-    print_v("concat(v1, v2)", &result);
+    varchar_concat((VARCHAR*)&v1, (VARCHAR*)&v2, (VARCHAR*)&result, MAX);
+    print_v("concat(v1, v2)", (VARCHAR*)&result);
 
     // Test compare
-    int cmp = varchar_cmp(&v1, &v2);
+    int cmp = varchar_cmp((VARCHAR*)&v1, (VARCHAR*)&v2);
     printf("cmp(v1, v2) = %d\n", cmp);
 
     // Test icmp
-    cmp = varchar_icmp(&v2, &result);
+    cmp = varchar_icmp((VARCHAR*)&v2, (VARCHAR*)&result);
     printf("icmp(v2, result) = %d\n", cmp);
 
     // Test strchr
-    int idx = varchar_index_char(&v2, 'o');
+    int idx = varchar_index_char((VARCHAR*)&v2, 'o');
     printf("index of 'o' in v2 = %d\n", idx);
 
     // Test strstr
-    cstr_to_varchar("lo", &result, MAX);
-    idx = varchar_index_of(&v1, &result);
+    cstr_to_varchar("lo", (VARCHAR*)&result, MAX);
+    idx = varchar_index_of((VARCHAR*)&v1, (VARCHAR*)&result);
     printf("index of \"lo\" in v1 = %d\n", idx);
 
     // Test strdup
-    VARCHAR *copy = varchar_strdup(&v2);
+    VARCHAR *copy = varchar_strdup((VARCHAR*)&v2);
     if (copy) {
-        print_v("strdup(v2)", copy);
+        print_v("strdup(v2)", (VARCHAR*)copy);
         free(copy);
     }
 
     // Test span
-    size_t span = varchar_span(&v2, "Wor");
+    size_t span = varchar_span((VARCHAR*)&v2, "Wor");
     printf("span of v2 with 'Wor' = %zu\n", span);
 
     // Test cspan
-    span = varchar_cspan(&v2, "ld");
+    span = varchar_cspan((VARCHAR*)&v2, "ld");
     printf("cspan of v2 with 'ld' = %zu\n", span);
 
     // Test memset-like
-    varchar_set(&result, '*', 10, MAX);
-    print_v("set '*'", &result);
+    varchar_set((VARCHAR*)&result, '*', 10, MAX);
+    print_v("set '*'", (VARCHAR*)&result);
 
     // Test move
-    varchar_move(&v1, &v2, MAX);
-    print_v("move(v2→v1)", &v1);
+    varchar_move((VARCHAR*)&v1, (VARCHAR*)&v2, MAX);
+    print_v("move(v2→v1)", (VARCHAR*)&v1);
 
     // Test bzero
-    varchar_bzero(&v2, MAX);
-    print_v("bzero(v2)", &v2);
+    varchar_bzero((VARCHAR*)&v2, MAX);
+    print_v("bzero(v2)", (VARCHAR*)&v2);
 
     return 0;
 }
