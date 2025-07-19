@@ -9,8 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Include utility function implementations so they are precompiled */
-EXEC SQL INCLUDE dbms_output_util;
+/*
+ * Include the DBMS_OUTPUT helper functions directly so the Pro*C
+ * precompiler processes them along with this demo program.
+ */
+#include "dbms_output_util.pc"
 
 EXEC SQL INCLUDE sqlca;
 
