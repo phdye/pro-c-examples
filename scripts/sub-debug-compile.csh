@@ -73,7 +73,12 @@ set DEBUG="-g ${FORTIFY} ${STACK} ${MF} ${ARRAY} ${GLIBC}"
 set WARN  = " -Wall -Wextra"
 set IGN   = " -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable"
 set IGN   = "${IGN} -Wno-parentheses -Wno-implicit-function-declaration -Wno-implicit-int" 
-# set IGN   = "${IGN} -Wno-incompatible-pointer-types"
+
+release=$(uname -r | sed -e 's/^\(.\).*/\1/')
+if [[ $(uname -o) == "Cygwin" && $release -ge 2 ]] ; then
+    set IGN   = "${IGN} -Wno-incompatible-pointer-types"
+fi
+
 set DEFER = " -Wno-pointer-sign -Wno-format-extra-args"
 
 # Pro*C generates incomplete field initializers
