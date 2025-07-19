@@ -1,0 +1,5 @@
+$ ./dbms-output-usage
+-- Print to stdout --
+dbms_output.get_lines failed: ORA--1405: ORA-01405: The fetched column returned a NULL value.
+Help: https://do
+
