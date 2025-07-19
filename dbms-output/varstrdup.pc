@@ -1,0 +1,10 @@
+char* varstrdup(const VARCHAR *src);
+
+
+char* varstrdup(const VARCHAR *src) {
+    char *copy = (char*) malloc(src->len);
+    if (!copy)
+        return NULL;
+    memcpy(copy, src->arr, src->len);    
+    return copy;
+}
