@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <ctype.h> // For isspace()
 
-EXEC SQL INCLUDE sqlca;
+#ifdef __CYGWIN__
+#include <sqlca.h>
+#else
+// EXEC SQL INCLUDE SQLCA;
+#endif
 
 void sql_check(const char *msg);
 char *rtrim(char *str);
