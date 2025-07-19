@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>  // for memcpy, strncpy
 
 EXEC SQL INCLUDE sqlca;
 
@@ -136,33 +136,59 @@ int dbms_output_fetch(char *line, short *line_ind, int *status) {
     return *status;
 }
 
-size_t dbms_output_fetch_lines(char lines[][32767], size_t max_lines) {
-    // Variables passed to the SQL block must be declared in the
-    // DECLARE SECTION to ensure they are properly handled by Pro*C.
-    EXEC SQL BEGIN DECLARE SECTION;
-    char **x_lines = (char **) lines;
-    int num = (int) max_lines;
-    EXEC SQL END DECLARE SECTION;
 
-    EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
-    EXEC SQL EXECUTE
-        BEGIN
-            dbms_output.get_lines(:x_lines, :num);
-        END;
-    END-EXEC;
+EXEC SQL BEGIN DECLARE SECTION;
+#define MAX_LINE_LENGTH 32767
+#define MAX_LINES 1000  /* or some maximum upper bound */
+    static VARCHAR ora_lines[MAX_LINES][MAX_LINE_LENGTH + 1];
+EXEC SQL END DECLARE SECTION;
 
-    return (size_t) num;
+size_t dbms_output_fetch_lines(char lines[][MAX_LINE_LENGTH], size_t max_lines) {
+
+    size_t fetched = 0;
+
+    while (fetched < max_lines) {
+        EXEC SQL BEGIN DECLARE SECTION;
+        int ora_num_lines = (int) (max_lines - fetched);
+        EXEC SQL END DECLARE SECTION;
+
+        if (ora_num_lines > MAX_LINES)
+            ora_num_lines = MAX_LINES;
+        EXEC SQL WHENEVER SQLERROR DO dbms_output_check("dbms_output.get_lines");
+        EXEC SQL EXECUTE
+            BEGIN
+                DBMS_OUTPUT.GET_LINES(:ora_lines, :ora_num_lines);
+            END;
+        END-EXEC;
+
+        if (sqlca.sqlcode == 1403) {  // No more lines
+                break;  // Exit loop if no more lines to fetch
+        }
+        dbms_output_check("dbms_output.get_lines");
+
+        if (ora_num_lines <= 0) {
+            break;  // No lines fetched, exit loop
+        }
+
+        for (int i = 0; i < ora_num_lines && ora_lines[i].len > 0; ++i) {
+            strncpy(lines[fetched], (const char *)ora_lines[i].arr, ora_lines[i].len);
+            lines[fetched][ora_lines[i].len] = '\0';  // null-terminate
+            fetched++;
+        }
+    }
+
+    return fetched;
 }
 
 void dbms_output_print_stdout(void) {
     char lines[20][32767];
-    size_t count;
+    size_t found;
 
     do {
-        count = dbms_output_fetch_lines(lines, 20);
-        for (size_t i = 0; i < count; ++i)
+        found = dbms_output_fetch_lines(lines, 20);
+        for (size_t i = 0; i < found; ++i)
             printf("%s\n", lines[i]);
-    } while (count > 0);
+    } while (found > 0);
 }
 
 void dbms_output_print_file(FILE *fp) {

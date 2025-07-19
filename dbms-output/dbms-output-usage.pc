@@ -9,12 +9,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// EXEC SQL INCLUDE sqlca;
+#include <sqlca.h>
+
 /*
  * Include the DBMS_OUTPUT helper functions directly so the Pro*C
  * precompiler processes them along with this demo program.
  */
-EXEC SQL INCLUDE sqlca;
-
 EXEC SQL INCLUDE dbms_output_util.pc;
 
 /* Simple helper to connect using CONNECT env variable */
