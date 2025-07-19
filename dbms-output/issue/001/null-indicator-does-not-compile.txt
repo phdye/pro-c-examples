@@ -1,0 +1,26 @@
+Script started on 2025-07-19 03:53:50-04:00 [COMMAND="set -x && ./scripts/debug-compile.sh dbms-output.pc" TERM="screen.xterm-256color" TTY="/dev/pty3" COLUMNS="121" LINES="38"]
++ ./scripts/debug-compile.sh dbms-output.pc
+set PROC_OPT = "SQLCHECK=SEMANTICS mode=oracle"
+proc USERID="${CONNECT}" ${PROC_OPT} "$pc" | & tee proc.log
+Pro*C/C++: Release 23.0.0.0.0 - Production on Sat Jul 19 03:53:50 2025
+Version 23.6.0.24.10
+Copyright (c) 1982, 2024, Oracle and/or its affiliates.  All rights reserved.
+System default option values taken from: D:\app\oracle\db\23-6\dbhomeFree\precomp\admin\pcscfg.cfg
+Error at line 47, column 56 in file dbms-output.pc
+                dbms_output.get_line(:line:indicator, :status);
+.......................................................1
+PLS-S-00103, Encountered the symbol ":" when expecting one of the following:
+   . ( ) , * @ % & | = - + < / > at in is mod remainder not null
+   rem returning with => .. <an exponent (**)> <> or != or ~= >=
+   <= <> and or default like like2 like4 likec as between error
+   from on using || indicator multiset member empty submultiset
+   lax strict without pretty ascii true false absent format
+   allow truncate ignore extended <=> <-> <#>
+The symbol ":" was ignored.
+Semantic error at line 46, column 13, file dbms-output.pc:
+            BEGIN
+............1
+PCC-S-02347, PL/SQL found syntax errors
+if ( $status != 0 ) exit 1
+Script done on 2025-07-19 03:53:51-04:00 [COMMAND_EXIT_CODE="1"]
+

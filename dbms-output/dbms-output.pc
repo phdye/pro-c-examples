@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h> // For isspace()
 
 EXEC SQL INCLUDE sqlca;
 
-void sql_check(const char *msg) {
-    if (sqlca.sqlcode != 0) {
-        fprintf(stderr, "%s failed: ORA-%d: %.*s\n", msg, sqlca.sqlcode, sqlca.sqlerrm.sqlerrml, sqlca.sqlerrm.sqlerrmc);
-        exit(1);
-    }
-}
+void sql_check(const char *msg);
+char *rtrim(char *str);
 
 int main() {
 
@@ -36,6 +33,7 @@ int main() {
     // Prepare to fetch output
     EXEC SQL BEGIN DECLARE SECTION;
     char line[32767];
+    short indicator = 0; // Used to check if the line is NULL
     int status;
     EXEC SQL END DECLARE SECTION;
 
@@ -46,16 +44,45 @@ int main() {
     do {
         EXEC SQL EXECUTE
             BEGIN
-                dbms_output.get_line(:line, :status);
+                dbms_output.get_line(:line:indicator, :status);
             END;
         END-EXEC;
+        sql_check("dbms_output.get_line");
+
+        if (indicator < 0) {
+            // If indicator is negative, it means the line is NULL
+            status = -1; // Set status to -1 to indicate no output
+        } else {
+            status = 0; // Set status to 0 to indicate valid output
+        }
 
         if (status == 0)
-            printf("%s\n", line);
+            printf("%s\n", rtrim(line));
 
     } while (status == 0);
 
     EXEC SQL COMMIT WORK RELEASE;
 
     return 0;
+}
+
+void sql_check(const char *msg) {
+    if (sqlca.sqlcode != 0) {
+        fprintf(stderr, "%s failed: ORA-%d: %.*s\n", msg, sqlca.sqlcode, sqlca.sqlerrm.sqlerrml, sqlca.sqlerrm.sqlerrmc);
+        exit(1);
+    }
+}
+
+char* rtrim(char *str) {
+    int i = strlen(str) - 1; // Start from the end of the string
+
+    // Loop backwards while characters are whitespace and within string bounds
+    while (i >= 0 && isspace((unsigned char)str[i])) {
+        i--;
+    }
+
+    // Place the null terminator after the last non-whitespace character
+    str[i + 1] = '\0';
+
+    return str;
 }
