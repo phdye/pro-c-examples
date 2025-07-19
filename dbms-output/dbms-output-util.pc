@@ -259,4 +259,3 @@ size_t dbms_output_collect_array(char **lines, size_t max_lines)
 
     return count;
 }
-
