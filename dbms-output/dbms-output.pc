@@ -33,7 +33,7 @@ int main() {
     // Prepare to fetch output
     EXEC SQL BEGIN DECLARE SECTION;
     char line[32767];
-    short indicator = 0; // Used to check if the line is NULL
+    short line_ind = 0; // Used to check if the line is NULL
     int status;
     EXEC SQL END DECLARE SECTION;
 
@@ -44,13 +44,13 @@ int main() {
     do {
         EXEC SQL EXECUTE
             BEGIN
-                dbms_output.get_line(:line:indicator, :status);
+                dbms_output.get_line(:line:line_ind, :status);
             END;
         END-EXEC;
         sql_check("dbms_output.get_line");
 
-        if (indicator < 0) {
-            // If indicator is negative, it means the line is NULL
+        if (line_ind < 0) {
+            // If line_ind is negative, it means the line is NULL
             status = -1; // Set status to -1 to indicate no output
         } else {
             status = 0; // Set status to 0 to indicate valid output
