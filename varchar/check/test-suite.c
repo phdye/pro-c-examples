@@ -54,7 +54,10 @@ static void abort_check_str(void) {
 
 static void abort_zsetlen_overflow(void) {
     DECL_VARCHAR(v, 3);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
     strcpy(v.arr, "abcd");
+#pragma GCC diagnostic pop
     VARCHAR_ZSETLEN(v);
 }
 
@@ -72,7 +75,10 @@ static void abort_copy_small_dest(void) {
 
 static void abort_copy_in_overflow(void) {
     DECL_VARCHAR(v, 3);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
     VARCHAR_COPY_IN(v, "abcd");
+#pragma GCC diagnostic pop
 }
 
 static void abort_copy_out_small(void) {
