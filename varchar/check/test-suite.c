@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 #include "varchar-check.h"
 
 #define DECL_VARCHAR(name, size) struct { unsigned short len; char arr[size]; } name
@@ -24,6 +25,11 @@ static int verbose = 0;
 static void expect_abort(void (*fn)(void), const char *name) {
     pid_t pid = fork();
     if (pid == 0) {
+        int devnull = open("/dev/null", O_WRONLY);
+        if (devnull >= 0) {
+            dup2(devnull, STDERR_FILENO);
+            close(devnull);
+        }
         fn();
         exit(0);
     } else {
